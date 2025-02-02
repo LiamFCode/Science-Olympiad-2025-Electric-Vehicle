@@ -10,17 +10,17 @@ volatile int standbySwitch; // Toggle starter switch
 int accelerateIncrement = 15; // Controls rate of speed change
 
 // Constants
-const int PULSES_PER_ROTATION = 408; // Encoder pulses per full wheel rotation
-const float WHEEL_DIAMETER = 11.3; // Wheel diameter in cm
-const float WHEEL_CIRCUMFERENCE = WHEEL_DIAMETER * 3.14159; // Circumference calculation
-const int MAX_SPEED = 200; // Max speed limit
-const float CRAWL_SPEED = 15;
-const int MIN_DECEL_DISTANCE = 50; // Minimum cm to start slowing
-const float SPEED_SCALING_FACTOR = 0.6; // Reduce speed as target approaches
-const float DISTANCE_THRESHOLD = 0.05; // Rotations precision
-const unsigned long UPDATE_INTERVAL = 100; // Interval for loop updates
-const unsigned long LCD_UPDATE_INTERVAL = 250; // Interval for LCD updates
-const unsigned long SPEED_CALC_INTERVAL = 100; // Interval for speed calculations
+const int pulsesPerRotation = 408; // Encoder pulses per full wheel rotation
+const float wheelDiameter = 11.3; // Wheel diameter in cm
+const float wheelCircumference = wheelDiameter * 3.14159; // Circumference calculation
+const int maxSpeed = 200; // Max speed limit
+const float crawlSpeed = 15;
+const int minDecelDistance = 50; // Minimum cm to start slowing
+const float speedScalingFactor = 0.6; // Reduce speed as target approaches
+const float distanceThreshold = 0.05; // Rotations precision
+const unsigned long updateInterval = 100; // Interval for loop updates
+const unsigned long LCDupdateInterval = 250; // Interval for LCD updates
+const unsigned long speedCalcInterval = 100; // Interval for speed calculations
 unsigned long lastLCDUpdate = 0; // Track last LCD update time
 
 unsigned long lastSpeedCalc = 0;
@@ -44,7 +44,7 @@ LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 // New: Calculate deceleration point based on target distance
 float calculateDecelPoint(float targetRotations) {
-    float minDecelRotations = MIN_DECEL_DISTANCE / WHEEL_CIRCUMFERENCE;
+    float minDecelRotations = minDecelDistance / wheelCircumference;
     return targetRotations - minDecelRotations;
 }
 
@@ -73,7 +73,7 @@ void updateLCD() {
       lcd.print("Max Speed");
       lcd.setCursor(0, 1);
       lcd.print("Dist: ");
-      lcd.print(distanceEncoderCount / PULSES_PER_ROTATION * WHEEL_CIRCUMFERENCE);
+      lcd.print(distanceEncoderCount / pulsesPerRotation * wheelCircumference);
       break;
       
     case DECELERATING:
@@ -87,14 +87,14 @@ void updateLCD() {
       lcd.print("Crawling");
       lcd.setCursor(0,1);
       lcd.print("Dist: ");
-      lcd.print(distanceEncoderCount / PULSES_PER_ROTATION * WHEEL_CIRCUMFERENCE);
+      lcd.print(distanceEncoderCount / pulsesPerRotation * wheelCircumference);
       break;
       
     case STOPPED:
       lcd.print("Stopped");
       lcd.setCursor(0, 1);
       lcd.print("Dist: ");
-      lcd.print(distanceEncoderCount / PULSES_PER_ROTATION * WHEEL_CIRCUMFERENCE);
+      lcd.print(distanceEncoderCount / pulsesPerRotation * wheelCircumference);
       break;
   }
 }
@@ -117,12 +117,12 @@ void setup() {
 void loop() {
   unsigned long currentTime = millis();
   
-  if (currentTime - lastUpdateTime >= UPDATE_INTERVAL) {
+  if (currentTime - lastUpdateTime >= updateInterval) {
     lastUpdateTime = currentTime;
     updateMotorSpeed();
   }
   
-  if (currentTime - lastLCDUpdate >= LCD_UPDATE_INTERVAL) {
+  if (currentTime - lastLCDUpdate >= LCDupdateInterval) {
     lastLCDUpdate = currentTime;
     updateLCD();
   }
@@ -130,16 +130,16 @@ void loop() {
 
 void updateMotorSpeed() {
   unsigned long currentTime = millis();
-  if (currentTime - lastSpeedCalc >= SPEED_CALC_INTERVAL) {
+  if (currentTime - lastSpeedCalc >= speedCalcInterval) {
     lastSpeedCalc = currentTime;
-    actualSpeed = ((float)speedEncoderCount / PULSES_PER_ROTATION) * (60000.0 / SPEED_CALC_INTERVAL);
+    actualSpeed = ((float)speedEncoderCount / pulsesPerRotation) * (60000.0 / speedCalcInterval);
     speedEncoderCount = 0;
   }
 
   standbySwitch = digitalRead(7);
   potentiometerValue = analogRead(A0);
   int threshold = constrain(map(potentiometerValue, 0, 1023, 700, 1000), 700, 1000);
-  float targetRotations = threshold / WHEEL_CIRCUMFERENCE;
+  float targetRotations = threshold / wheelCircumference;
   float maintainingStartRotations = 2.82; // 100/wheel circumference
   
   // Determine deceleration point
@@ -154,27 +154,27 @@ void updateMotorSpeed() {
       break;
 
     case ACCELERATING:
-      if (motorSpeed < MAX_SPEED) {
+      if (motorSpeed < maxSpeed) {
         motorSpeed += accelerateIncrement;
         setMotorSpeed(motorSpeed);
       }
-      if (distanceEncoderCount / PULSES_PER_ROTATION >= maintainingStartRotations) {
+      if (distanceEncoderCount / pulsesPerRotation >= maintainingStartRotations) {
         currentState = MAINTAINING;
       }
       break;
 
     case MAINTAINING:
-      setMotorSpeed(MAX_SPEED);
-      if (distanceEncoderCount / PULSES_PER_ROTATION >= decelStartRotations) {
-        motorSpeed = MAX_SPEED * 0.9;
+      setMotorSpeed(maxSpeed);
+      if (distanceEncoderCount / pulsesPerRotation >= decelStartRotations) {
+        motorSpeed = maxSpeed * 0.9;
         currentState = DECELERATING;
       }
       break;
 
     case DECELERATING:
-      float remainingRotations = targetRotations - (distanceEncoderCount / PULSES_PER_ROTATION);
+      float remainingRotations = targetRotations - (distanceEncoderCount / pulsesPerRotation);
       if (remainingRotations > 0) {  // Make sure we haven't passed target
-        motorSpeed = max(CRAWL_SPEED, motorSpeed - 2); // Fixed deceleration rate
+        motorSpeed = max(crawlSpeed, motorSpeed - 2); // Fixed deceleration rate
         setMotorSpeed(motorSpeed);
       } else {
         motorSpeed = 0;  // Emergency stop if we pass target
@@ -184,8 +184,8 @@ void updateMotorSpeed() {
       break;
 
     case CRAWLING:
-      if (distanceEncoderCount / PULSES_PER_ROTATION < targetRotations) {
-        setMotorSpeed(CRAWL_SPEED);
+      if (distanceEncoderCount / pulsesPerRotation < targetRotations) {
+        setMotorSpeed(crawlSpeed);
       } else {
         currentState = STOPPED;
       }
@@ -204,7 +204,7 @@ void encoderISR() {
 }
 
 void setMotorSpeed(int speed) {
-  speed = constrain(speed, 0, MAX_SPEED);
+  speed = constrain(speed, 0, maxSpeed);
  
   if (speed == 0) {
     digitalWrite(8, LOW);
