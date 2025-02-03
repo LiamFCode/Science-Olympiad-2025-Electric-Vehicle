@@ -1,3 +1,36 @@
+/* 
+ * @title: Electric Vehicle
+ * @author: Liam Fending
+ * @competition: Science Olympiad 2025, Division C, Regionals
+ * @details: This code is designed for the electric vehicle event in the division C of Science Olympiad 2025 regionals competition.
+ *           In this event you must build and test an arduino powered car prior to the day of competition that gets as close as
+ *           possible to a target, announced after the impound period, within 7 to 10 meters and does so in the least time possible.
+ *           The code is writen to run in the Arduino IDE with the LiquidCrystal extension to support the LCD display.
+ *
+ * @MIT License
+ *
+ * Copyright (c) [2025] [Liam Fending]
+ *
+ *  Permission is hereby granted, free of charge, to any person obtaining a copy
+ *  of this software and associated documentation files (the "Software"), to deal
+ *  in the Software without restriction, including without limitation the rights
+ *  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ *  copies of the Software, and to permit persons to whom the Software is
+ *  furnished to do so, subject to the following conditions:
+ *
+ *  The above copyright notice and this permission notice shall be included in all
+ *  copies or substantial portions of the Software.
+ *
+ *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ *  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ *  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ *  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ *  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ *  SOFTWARE.
+ */
+
+
 //This repository is designed to work with in the Arduino IDE with the LiquidCrystal extension
 
 // Variables
