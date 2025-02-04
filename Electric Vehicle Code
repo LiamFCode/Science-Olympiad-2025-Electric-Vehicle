@@ -75,7 +75,7 @@ MotorState currentState = STANDBY;
 const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 13, d7 = 6;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
-// New: Calculate deceleration point based on target distance
+// Calculate deceleration point based on target distance
 float calculateDecelPoint(float targetRotations) {
     float minDecelRotations = minDecelDistance / wheelCircumference;
     return targetRotations - minDecelRotations;
